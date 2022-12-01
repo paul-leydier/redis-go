@@ -28,19 +28,21 @@ func main() {
 
 func serve(conn net.Conn) {
 	defer conn.Close()
-	msg := make([]byte, 64)
-	_, err := conn.Read(msg)
-	if err != nil {
-		log.Fatalf("could not read message - %s", err)
-	}
-	msg = bytes.Trim(msg, "\x00")
-	response, err := handleMessage(msg)
-	if err != nil {
-		log.Fatalf("could not handle message - %s", err)
-	}
-	_, err = conn.Write(response)
-	if err != nil {
-		log.Fatalf("could not write response - %s", err)
+	for {
+		msg := make([]byte, 64)
+		_, err := conn.Read(msg)
+		if err != nil {
+			log.Fatalf("could not read message - %s", err)
+		}
+		msg = bytes.Trim(msg, "\x00")
+		response, err := handleMessage(msg)
+		if err != nil {
+			log.Fatalf("could not handle message - %s", err)
+		}
+		_, err = conn.Write(response)
+		if err != nil {
+			log.Fatalf("could not write response - %s", err)
+		}
 	}
 }
 
