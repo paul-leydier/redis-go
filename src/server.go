@@ -18,6 +18,6 @@ func main() {
 	}
 	_, err = l.Accept()
 	if err != nil {
-		log.Fatalf("could not accept connetion - %s", err)
+		log.Fatalf("could not accept connection - %s", err)
 	}
 }
