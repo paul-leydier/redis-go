@@ -19,11 +19,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not bind to port - %s", err)
 	}
-	conn, err := l.Accept()
-	if err != nil {
-		log.Fatalf("could not accept connection - %s", err)
+	for {
+		conn, err := l.Accept()
+		if err != nil {
+			log.Fatalf("could not accept connection - %s", err)
+		}
+		go serve(conn)
 	}
-	serve(conn)
 }
 
 func serve(conn net.Conn) {
