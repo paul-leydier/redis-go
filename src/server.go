@@ -29,7 +29,12 @@ func main() {
 }
 
 func serve(conn net.Conn) {
-	defer conn.Close()
+	defer func(conn net.Conn) {
+		err := conn.Close()
+		if err != nil {
+			log.Printf("could not close connection - %s", err)
+		}
+	}(conn)
 	for {
 		msg := make([]byte, 64)
 		_, err := conn.Read(msg)
