@@ -2,21 +2,13 @@ package redis
 
 import (
 	"io"
-	"net"
 	"redis-go/server"
 	"testing"
 )
 
-func mockServerClient() (net.Conn, Client) {
-	clientConn, serverConn := net.Pipe()
-	client := NewClient("localhost", "6379")
-	client.conn = clientConn
-	return serverConn, client
-}
-
 func TestClient_Close(t *testing.T) {
 	// Client.Close() should properly close the client connection
-	serverConn, client := mockServerClient()
+	serverConn, client := MockServerClient()
 	err := client.Close()
 	if err != nil {
 		t.Fatalf("error during connection close - %s", err)
@@ -27,7 +19,7 @@ func TestClient_Close(t *testing.T) {
 }
 
 func TestClient_Ping(t *testing.T) {
-	serverConn, client := mockServerClient()
+	serverConn, client := MockServerClient()
 	go server.Serve(serverConn)
 	response, err := client.Ping("")
 	if err != nil {

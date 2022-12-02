@@ -54,3 +54,10 @@ func (r *Client) Ping(content string) (string, error) {
 	}
 	return resp, nil
 }
+
+func MockServerClient() (net.Conn, Client) {
+	clientConn, serverConn := net.Pipe()
+	client := NewClient("localhost", "6379")
+	client.conn = clientConn
+	return serverConn, client
+}
