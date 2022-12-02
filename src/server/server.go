@@ -52,7 +52,7 @@ func Serve(conn net.Conn) {
 }
 
 func handleMessage(msg []byte) ([]byte, error) {
-	command := strings.Split(strings.ToUpper(strings.TrimSpace(string(msg))), " ")
+	command := strings.Split(strings.ToUpper(strings.TrimSpace(core.RespDecode(msg))), " ")
 	if len(command) == 0 {
 		return nil, fmt.Errorf("empty command - %s", command)
 	}
@@ -66,7 +66,7 @@ func handleMessage(msg []byte) ([]byte, error) {
 
 func pingCommand(command []string) []byte {
 	if len(command) > 1 {
-		return core.RespEncode("string", command[1])
+		return core.RespEncode(core.SimpleString, command[1])
 	}
-	return core.RespEncode("string", "PONG")
+	return core.RespEncode(core.SimpleString, "PONG")
 }
