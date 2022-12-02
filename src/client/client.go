@@ -38,13 +38,14 @@ func (r *Client) Close() error {
 	return r.conn.Close()
 }
 
-func (r *Client) Ping(content string) (string, error) {
-	_, err := r.conn.Write(core.RespEncode(core.SimpleString, "PING "+content))
-	if err != nil {
-		return "", err
-	}
+func (r *Client) CustomCommand(command string, content string) error {
+	_, err := r.conn.Write(core.RespEncode(core.SimpleString, command+" "+content))
+	return err
+}
+
+func (r *Client) SimpleStringResponse() (string, error) {
 	encodedResponse := make([]byte, 64)
-	_, err = r.conn.Read(encodedResponse)
+	_, err := r.conn.Read(encodedResponse)
 	if err != nil {
 		return "", err
 	}
@@ -53,6 +54,14 @@ func (r *Client) Ping(content string) (string, error) {
 		return "", fmt.Errorf("invalid response - %s", resp)
 	}
 	return resp, nil
+}
+
+func (r *Client) Ping(content string) (string, error) {
+	err := r.CustomCommand("PING", content)
+	if err != nil {
+		return "", err
+	}
+	return r.SimpleStringResponse()
 }
 
 func MockServerClient() (net.Conn, Client) {

@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"net"
+	redis "redis-go/client"
 	"testing"
 )
 
@@ -58,5 +59,18 @@ func Test_Multiple_Pings(t *testing.T) {
 		if string(resp) != "+PONG\r\n" {
 			t.Fatalf("invalid response: expected %s, got %s", "+PONG", resp)
 		}
+	}
+}
+
+func TestInvalidCommand(t *testing.T) {
+	serverConn, client := redis.MockServerClient()
+	go Serve(serverConn)
+	err := client.CustomCommand("FOO", "")
+	if err != nil {
+		t.Fatalf("error while sending invalid command - %s", err)
+	}
+	_, err = client.SimpleStringResponse()
+	if err == nil {
+		t.Fatalf("invalid command did not raise an error")
 	}
 }

@@ -64,7 +64,7 @@ func handleMessage(msg []byte) ([]byte, error) {
 	case "PING":
 		return pingCommand(command), nil
 	default:
-		return nil, fmt.Errorf("unknown command - %s", command)
+		return nil, InvalidCommandError{received: command[0]}
 	}
 }
 
@@ -73,4 +73,22 @@ func pingCommand(command []string) []byte {
 		return core.RespEncode(core.SimpleString, command[1])
 	}
 	return core.RespEncode(core.SimpleString, "PONG")
+}
+
+// Serving errors -----------------------------------------
+
+func handleServingError(err error) []byte {
+	if icerr, ok := err.(InvalidCommandError); ok {
+		return core.RespEncode(core.Error, fmt.Sprintf("ERR %s", icerr.Error()))
+	}
+	log.Printf("serving error - %s", err)
+	return core.RespEncode(core.Error, "ERR internal error")
+}
+
+type InvalidCommandError struct {
+	received string
+}
+
+func (e InvalidCommandError) Error() string {
+	return fmt.Sprintf("unknown command '%s'", e.received)
 }
