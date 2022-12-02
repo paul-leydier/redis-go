@@ -21,7 +21,7 @@ func Test_Ping(t *testing.T) {
 	go func() {
 		Serve(server)
 	}()
-	msg := []byte("PING")
+	msg := []byte("+PING\r\n")
 	_, err := client.Write(msg)
 	if err != nil {
 		t.Fatalf("could not write to localhost:6379 - %s", err)
@@ -43,7 +43,7 @@ func Test_Multiple_Pings(t *testing.T) {
 	go func() {
 		Serve(server)
 	}()
-	msg := []byte("PING")
+	msg := []byte("+PING\r\n")
 	for i := 0; i < 10; i++ {
 		_, err := client.Write(msg)
 		if err != nil {
