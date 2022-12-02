@@ -22,6 +22,8 @@ func RespEncode(msgType RespType, content string) []byte {
 	switch msgType {
 	case SimpleString:
 		msg = fmt.Sprintf("+%s\r\n", content)
+	case Error:
+		msg = fmt.Sprintf("-%s\r\n", content)
 	default:
 		msg = ""
 	}
@@ -37,6 +39,9 @@ func RespDecode(msg []byte) (RespType, string) {
 	case '+':
 		decoded := string(msg[1:])
 		return SimpleString, strings.TrimRight(decoded, "\r\n")
+	case '-':
+		decoded := string(msg[1:])
+		return Error, strings.TrimRight(decoded, "\r\n")
 	default:
 		log.Panicf("unknown msg type identifier %b", msg[0])
 	}
