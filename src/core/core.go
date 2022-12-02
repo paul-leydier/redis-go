@@ -45,11 +45,11 @@ func RespDecode(msg []byte) (RespType, string) {
 		decoded := string(msg[1:])
 		return Error, strings.TrimRight(decoded, "\r\n")
 	case '$':
-		decoded := strings.SplitN(string(msg), "\r\n", 2)
-		if len(decoded) <= 2 {
+		parts := bytes.SplitN(msg, []byte("\r\n"), 2)
+		if len(parts) <= 2 {
 			log.Panicf("cannot decode BulkString %b", msg)
 		}
-		return BulkString, strings.TrimRight(decoded[1], "\r\n")
+		return BulkString, string(bytes.TrimRight(parts[1], "\r\n"))
 	default:
 		log.Panicf("unknown msg type identifier %b", msg[0])
 	}
