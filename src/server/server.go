@@ -42,7 +42,7 @@ func Serve(conn net.Conn) {
 		msg = bytes.Trim(msg, "\x00")
 		response, err := handleMessage(msg)
 		if err != nil {
-			log.Fatalf("could not handle message - %s", err)
+			response = handleServingError(err)
 		}
 		_, err = conn.Write(response)
 		if err != nil {
