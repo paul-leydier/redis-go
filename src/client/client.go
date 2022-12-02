@@ -64,6 +64,14 @@ func (r *Client) Ping(content string) (string, error) {
 	return r.SimpleStringResponse()
 }
 
+func (r *Client) Echo(content string) (string, error) {
+	err := r.CustomCommand("ECHO", content)
+	if err != nil {
+		return "", err
+	}
+	return r.SimpleStringResponse()
+}
+
 func MockServerClient() (net.Conn, Client) {
 	clientConn, serverConn := net.Pipe()
 	client := NewClient("localhost", "6379")

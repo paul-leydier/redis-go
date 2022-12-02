@@ -67,6 +67,8 @@ func handleMessage(msg []byte) ([]byte, error) {
 	switch strings.ToUpper(command[0]) {
 	case "PING":
 		return pingCommand(command), nil
+	case "ECHO":
+		return echoCommand(command), nil
 	default:
 		return nil, InvalidCommandError{received: command[0]}
 	}
@@ -77,6 +79,13 @@ func pingCommand(command []string) []byte {
 		return core.RespEncode(core.SimpleString, command[1])
 	}
 	return core.RespEncode(core.SimpleString, "PONG")
+}
+
+func echoCommand(command []string) []byte {
+	if len(command) == 1 {
+		return []byte("")
+	}
+	return core.RespEncode(core.SimpleString, command[1])
 }
 
 // Serving errors -----------------------------------------
