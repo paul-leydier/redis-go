@@ -52,7 +52,11 @@ func Serve(conn net.Conn) {
 }
 
 func handleMessage(msg []byte) ([]byte, error) {
-	command := strings.Split(strings.ToUpper(strings.TrimSpace(core.RespDecode(msg))), " ")
+	respType, message := core.RespDecode(msg)
+	if respType != core.SimpleString {
+		return nil, fmt.Errorf("commands should be SimpleString, got %d - %s", respType, message)
+	}
+	command := strings.Split(strings.ToUpper(strings.TrimSpace(message)), " ")
 	if len(command) == 0 {
 		return nil, fmt.Errorf("empty command - %s", command)
 	}

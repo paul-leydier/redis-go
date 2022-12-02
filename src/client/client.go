@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"fmt"
 	"net"
 	"redis-go/core"
 )
@@ -44,9 +45,12 @@ func (r *Client) Ping(content string) (string, error) {
 	}
 	encodedResponse := make([]byte, 64)
 	_, err = r.conn.Read(encodedResponse)
-	resp := core.RespDecode(encodedResponse)
 	if err != nil {
 		return "", err
+	}
+	respType, resp := core.RespDecode(encodedResponse)
+	if respType != core.SimpleString {
+		return "", fmt.Errorf("invalid response - %s", resp)
 	}
 	return resp, nil
 }
