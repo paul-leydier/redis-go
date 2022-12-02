@@ -2,13 +2,32 @@ package core
 
 import "testing"
 
+func assertEqual(t *testing.T, a string, b []byte) {
+	if a != string(b) {
+		t.Fatalf("expected %s, got %s", a, b)
+	}
+}
+
 func TestRespEncodeSimpleString(t *testing.T) {
 	// Encoding a simple string format
 	encoded := RespEncode(SimpleString, "lorem ipsum")
-	const expected = "+lorem ipsum\r\n"
-	if string(encoded) != expected {
-		t.Fatalf("excpected %s, got %b", expected, encoded)
-	}
+	assertEqual(t, "+lorem ipsum\r\n", encoded)
+}
+
+func TestRespEncodeBulkString(t *testing.T) {
+	// Encoding BulkString format
+	encoded := RespEncode(BulkString, "hello")
+	assertEqual(t, "$5\r\nhello\r\n", encoded)
+}
+
+func TestRespEncodeBulkStringEmpty(t *testing.T) {
+	encoded := RespEncode(BulkString, "")
+	assertEqual(t, "$0\r\n\r\n", encoded)
+}
+
+func TestRespEncodeBulkStringWithReturns(t *testing.T) {
+	encoded := RespEncode(BulkString, "hello \r\nworld!")
+	assertEqual(t, "$14\r\nhello \r\nworld!\r\n", encoded)
 }
 
 func TestRespDecodeSimpleString(t *testing.T) {

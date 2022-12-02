@@ -24,6 +24,8 @@ func RespEncode(msgType RespType, content string) []byte {
 		msg = fmt.Sprintf("+%s\r\n", content)
 	case Error:
 		msg = fmt.Sprintf("-%s\r\n", content)
+	case BulkString:
+		msg = fmt.Sprintf("$%d\r\n%s\r\n", len(content), content)
 	default:
 		msg = ""
 	}
@@ -42,6 +44,12 @@ func RespDecode(msg []byte) (RespType, string) {
 	case '-':
 		decoded := string(msg[1:])
 		return Error, strings.TrimRight(decoded, "\r\n")
+	case '$':
+		decoded := strings.SplitN(string(msg), "\r\n", 2)
+		if len(decoded) <= 2 {
+			log.Panicf("cannot decode BulkString %b", msg)
+		}
+		return BulkString, strings.TrimRight(decoded[1], "\r\n")
 	default:
 		log.Panicf("unknown msg type identifier %b", msg[0])
 	}
