@@ -60,11 +60,11 @@ func handleMessage(msg []byte) ([]byte, error) {
 	if respType != core.SimpleString {
 		return nil, fmt.Errorf("commands should be SimpleString, got %d - %s", respType, message)
 	}
-	command := strings.Split(strings.ToUpper(strings.TrimSpace(message)), " ")
+	command := strings.Split(strings.TrimSpace(message), " ")
 	if len(command) == 0 {
 		return nil, fmt.Errorf("empty command - %s", command)
 	}
-	switch command[0] {
+	switch strings.ToUpper(command[0]) {
 	case "PING":
 		return pingCommand(command), nil
 	default:
