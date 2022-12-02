@@ -36,3 +36,17 @@ func (r *Client) Connect() error {
 func (r *Client) Close() error {
 	return r.conn.Close()
 }
+
+func (r *Client) Ping(content string) (string, error) {
+	_, err := r.conn.Write(core.RespEncode(core.SimpleString, "PING "+content))
+	if err != nil {
+		return "", err
+	}
+	encodedResponse := make([]byte, 64)
+	_, err = r.conn.Read(encodedResponse)
+	resp := core.RespDecode(encodedResponse)
+	if err != nil {
+		return "", err
+	}
+	return resp, nil
+}
