@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// Core server logic --------------------------------------
+
 func Run(network string, url string, port string) {
 	l, err := net.Listen(network, url+":"+port)
 	if err != nil {
@@ -50,6 +52,8 @@ func Serve(conn net.Conn) {
 		}
 	}
 }
+
+// Instructions logic -------------------------------------
 
 func handleMessage(msg []byte) ([]byte, error) {
 	respType, message := core.RespDecode(msg)
