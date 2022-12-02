@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"bytes"
@@ -8,7 +8,7 @@ import (
 
 func Test_Listen(t *testing.T) {
 	// should be able to bind to localhost:6379
-	go main()
+	go Run("tcp", "localhost", "6379")
 	_, err := net.Dial("tcp", "localhost:6379")
 	if err != nil {
 		t.Fatalf("could not connect to localhost:6379 - %s", err)
@@ -19,7 +19,7 @@ func Test_Ping(t *testing.T) {
 	// A "PING" command should receive a "PONG" response
 	server, client := net.Pipe()
 	go func() {
-		serve(server)
+		Serve(server)
 	}()
 	msg := []byte("PING")
 	_, err := client.Write(msg)
@@ -41,7 +41,7 @@ func Test_Multiple_Pings(t *testing.T) {
 	// A single connection should be able to send multiple commands
 	server, client := net.Pipe()
 	go func() {
-		serve(server)
+		Serve(server)
 	}()
 	msg := []byte("PING")
 	for i := 0; i < 10; i++ {

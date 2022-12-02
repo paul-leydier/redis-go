@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"bytes"
@@ -9,27 +9,24 @@ import (
 	"strings"
 )
 
-const (
-	network string = "tcp"
-	url     string = "localhost"
-	port    string = "6379"
-)
-
-func main() {
+func Run(network string, url string, port string) {
 	l, err := net.Listen(network, url+":"+port)
 	if err != nil {
 		log.Fatalf("could not bind to port - %s", err)
 	}
+	Listen(l)
+}
+func Listen(l net.Listener) {
 	for {
 		conn, err := l.Accept()
 		if err != nil {
 			log.Fatalf("could not accept connection - %s", err)
 		}
-		go serve(conn)
+		go Serve(conn)
 	}
 }
 
-func serve(conn net.Conn) {
+func Serve(conn net.Conn) {
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {
