@@ -1,6 +1,9 @@
 package redis
 
-import "net"
+import (
+	"net"
+	"redis-go/core"
+)
 
 const network string = "tcp"
 
@@ -11,7 +14,7 @@ type serverInfo struct {
 
 type Client struct {
 	server serverInfo
-	conn   *net.Conn
+	conn   net.Conn
 }
 
 func NewClient(url string, port string) Client {
@@ -26,10 +29,10 @@ func NewClient(url string, port string) Client {
 
 func (r *Client) Connect() error {
 	conn, err := net.Dial(network, r.server.Url+":"+r.server.Port)
-	r.conn = &conn
+	r.conn = conn
 	return err
 }
 
 func (r *Client) Close() error {
-	return (*r.conn).Close()
+	return r.conn.Close()
 }

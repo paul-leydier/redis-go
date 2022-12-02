@@ -9,7 +9,7 @@ import (
 func mockServerClient() (net.Conn, Client) {
 	clientConn, serverConn := net.Pipe()
 	client := NewClient("localhost", "6379")
-	client.conn = &clientConn
+	client.conn = clientConn
 	return serverConn, client
 }
 
