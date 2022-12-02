@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"redis-go/core"
 	"strings"
 )
 
@@ -68,16 +69,7 @@ func handleMessage(msg []byte) ([]byte, error) {
 
 func pingCommand(command []string) []byte {
 	if len(command) > 1 {
-		return respEncode("string", command[1])
+		return core.RespEncode("string", command[1])
 	}
-	return respEncode("string", "PONG")
-}
-
-func respEncode(responseType string, content string) []byte {
-	switch responseType {
-	case "string":
-		return []byte(fmt.Sprintf("+%s\r\n", content))
-	default:
-		return []byte("")
-	}
+	return core.RespEncode("string", "PONG")
 }
