@@ -67,5 +67,5 @@ func parseBulkString(msg []byte) string {
 		msgLength = (msgLength * 10) + (msg[i] - '0')
 		prefixLength = i
 	}
-	return string(msg[prefixLength+2 : prefixLength+2+int(msgLength)])
+	return string(msg[prefixLength+3 : prefixLength+3+int(msgLength)])
 }
