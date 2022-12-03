@@ -40,3 +40,15 @@ func TestRespDecodeSimpleString(t *testing.T) {
 		t.Fatalf("expected %s, got %s", expected, decoded)
 	}
 }
+
+func BenchmarkParseBulkStringNaive(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		parseBulkStringNaive([]byte("$14\r\nhello \r\nworld!\r\n"))
+	}
+}
+
+func BenchmarkParseBulkString(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		parseBulkString([]byte("$14\r\nhello \r\nworld!\r\n"))
+	}
+}
