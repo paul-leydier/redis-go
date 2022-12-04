@@ -17,6 +17,15 @@ func TestRespElem_EncodeSimpleString(t *testing.T) {
 	assertEqual(t, "+lorem ipsum\r\n", encoded)
 }
 
+func TestRespElem_EncodeError(t *testing.T) {
+	// Encoding a RESP error
+	encoded := RespElem{
+		Type:    Error,
+		Content: "Error message",
+	}.Encode()
+	assertEqual(t, "-Error message\r\n", encoded)
+}
+
 func TestRespElem_EncodeInteger(t *testing.T) {
 	// Encoding an Integer format
 	encoded := RespElem{
