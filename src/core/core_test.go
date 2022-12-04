@@ -17,6 +17,24 @@ func TestRespElem_EncodeSimpleString(t *testing.T) {
 	assertEqual(t, "+lorem ipsum\r\n", encoded)
 }
 
+func TestRespElem_EncodeInteger(t *testing.T) {
+	// Encoding an Integer format
+	encoded := RespElem{
+		Type:    Integer,
+		Content: 123,
+	}.Encode()
+	assertEqual(t, ":123\r\n", encoded)
+}
+
+func TestRespElem_EncodeIntegerNegative(t *testing.T) {
+	// Encoding an Integer format
+	encoded := RespElem{
+		Type:    Integer,
+		Content: -3,
+	}.Encode()
+	assertEqual(t, ":-3\r\n", encoded)
+}
+
 func TestRespElem_EncodeBulkString(t *testing.T) {
 	// Encoding BulkString format
 	encoded := RespElem{
