@@ -86,6 +86,20 @@ func TestRespElem_EncodeArrayBulkStrings(t *testing.T) {
 	assertEqual(t, "*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n", encoded)
 }
 
+func TestRespElem_EncodeArrayMixedType(t *testing.T) {
+	encoded := RespElem{
+		Type: Array,
+		Content: []RespElem{
+			{Integer, 1},
+			{Integer, 2},
+			{Integer, 3},
+			{Integer, 4},
+			{BulkString, "hello"},
+		},
+	}.Encode()
+	assertEqual(t, "*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n", encoded)
+}
+
 func TestRespDecodeSimpleString(t *testing.T) {
 	respType, decoded := RespDecode([]byte("+lorem ipsum\r\n"))
 	if respType != SimpleString {
