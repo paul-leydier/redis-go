@@ -8,25 +8,37 @@ func assertEqual(t *testing.T, a string, b []byte) {
 	}
 }
 
-func TestRespEncodeSimpleString(t *testing.T) {
+func TestRespElem_EncodeSimpleString(t *testing.T) {
 	// Encoding a simple string format
-	encoded := RespEncode(SimpleString, "lorem ipsum")
+	encoded := RespElem{
+		Type:    SimpleString,
+		Content: "lorem ipsum",
+	}.Encode()
 	assertEqual(t, "+lorem ipsum\r\n", encoded)
 }
 
-func TestRespEncodeBulkString(t *testing.T) {
+func TestRespElem_EncodeBulkString(t *testing.T) {
 	// Encoding BulkString format
-	encoded := RespEncode(BulkString, "hello")
+	encoded := RespElem{
+		Type:    BulkString,
+		Content: "hello",
+	}.Encode()
 	assertEqual(t, "$5\r\nhello\r\n", encoded)
 }
 
-func TestRespEncodeBulkStringEmpty(t *testing.T) {
-	encoded := RespEncode(BulkString, "")
+func TestRespElem_EncodeBulkStringEmpty(t *testing.T) {
+	encoded := RespElem{
+		Type:    BulkString,
+		Content: "",
+	}.Encode()
 	assertEqual(t, "$0\r\n\r\n", encoded)
 }
 
-func TestRespEncodeBulkStringWithReturns(t *testing.T) {
-	encoded := RespEncode(BulkString, "hello \r\nworld!")
+func TestRespElem_EncodeBulkStringWithReturns(t *testing.T) {
+	encoded := RespElem{
+		Type:    BulkString,
+		Content: "hello \r\nworld!",
+	}.Encode()
 	assertEqual(t, "$14\r\nhello \r\nworld!\r\n", encoded)
 }
 
