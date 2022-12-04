@@ -16,6 +16,29 @@ func Test_Listen(t *testing.T) {
 	}
 }
 
+func Test_ConcurrentClients(t *testing.T) {
+	// Multiple clients should be able to interact concurrently with the server
+	go Run("tcp", "localhost", "6380")
+	client1 := redis.NewClient("localhost", "6380")
+	client2 := redis.NewClient("localhost", "6380")
+	_, err := client1.Ping("")
+	if err != nil {
+		t.Fatalf("error during client1 Ping - %s", err)
+	}
+	_, err = client2.Ping("")
+	if err != nil {
+		t.Fatalf("error during client2 Ping - %s", err)
+	}
+	err = client1.Close()
+	if err != nil {
+		t.Fatalf("error while closing client1 - %s", err)
+	}
+	err = client2.Close()
+	if err != nil {
+		t.Fatalf("error while closing client1 - %s", err)
+	}
+}
+
 func Test_Ping(t *testing.T) {
 	// A "PING" command should receive a "PONG" response
 	server, client := net.Pipe()
