@@ -98,3 +98,13 @@ func BenchmarkParseBulkString(b *testing.B) {
 		parseBulkString([]byte("$14\r\nhello \r\nworld!\r\n"))
 	}
 }
+
+func BenchmarkRespElem_Encode(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		// Encoding a simple string format
+		RespElem{
+			Type:    SimpleString,
+			Content: "lorem ipsum",
+		}.Encode()
+	}
+}
