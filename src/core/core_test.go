@@ -109,6 +109,19 @@ func TestRespElem_EncodeArrayMixedType(t *testing.T) {
 	assertEqual(t, "*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n", encoded)
 }
 
+func TestRespElem_EncodeUnknownType(t *testing.T) {
+	// Trying to encode a non-existing RespType should panic
+	defer func() { // assert panic
+		if r := recover(); r == nil {
+			t.Fatalf("did not panic")
+		}
+	}()
+	RespElem{
+		Type:    123456789, // non-existing RespType
+		Content: "toto",
+	}.Encode()
+}
+
 func TestRespDecodeSimpleString(t *testing.T) {
 	respType, decoded := RespDecode([]byte("+lorem ipsum\r\n"))
 	if respType != SimpleString {
