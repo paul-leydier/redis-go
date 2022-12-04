@@ -17,15 +17,21 @@ const (
 	Array
 )
 
-func RespEncode(msgType RespType, content string) []byte {
+type RespElem struct {
+	Type    RespType
+	Content any
+}
+
+func (r RespElem) Encode() []byte {
 	var msg string
-	switch msgType {
+	switch r.Type {
 	case SimpleString:
-		msg = fmt.Sprintf("+%s\r\n", content)
+		msg = fmt.Sprintf("+%s\r\n", r.Content.(string))
 	case Error:
-		msg = fmt.Sprintf("-%s\r\n", content)
+		msg = fmt.Sprintf("-%s\r\n", r.Content.(string))
 	case BulkString:
-		msg = fmt.Sprintf("$%d\r\n%s\r\n", len(content), content)
+		c := r.Content.(string)
+		msg = fmt.Sprintf("$%d\r\n%s\r\n", len(c), c)
 	default:
 		msg = ""
 	}

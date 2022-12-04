@@ -82,26 +82,41 @@ func handleMessage(msg []byte) ([]byte, error) {
 
 func pingCommand(command []string) []byte {
 	if len(command) > 1 {
-		return core.RespEncode(core.SimpleString, command[1])
+		return core.RespElem{
+			Type:    core.SimpleString,
+			Content: command[1],
+		}.Encode()
 	}
-	return core.RespEncode(core.SimpleString, "PONG")
+	return core.RespElem{
+		Type:    core.SimpleString,
+		Content: "PONG",
+	}.Encode()
 }
 
 func echoCommand(command []string) []byte {
 	if len(command) == 1 {
 		return []byte("")
 	}
-	return core.RespEncode(core.SimpleString, command[1])
+	return core.RespElem{
+		Type:    core.SimpleString,
+		Content: command[1],
+	}.Encode()
 }
 
 // Serving errors -----------------------------------------
 
 func handleServingError(err error) []byte {
 	if icerr, ok := err.(InvalidCommandError); ok {
-		return core.RespEncode(core.Error, fmt.Sprintf("ERR %s", icerr.Error()))
+		return core.RespElem{
+			Type:    core.Error,
+			Content: fmt.Sprintf("ERR %s", icerr.Error()),
+		}.Encode()
 	}
 	log.Printf("serving error - %s", err)
-	return core.RespEncode(core.Error, "ERR internal error")
+	return core.RespElem{
+		Type:    core.Error,
+		Content: "ERR internal error",
+	}.Encode()
 }
 
 type InvalidCommandError struct {

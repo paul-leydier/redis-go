@@ -45,7 +45,11 @@ func (r *Client) CustomCommand(command string, content string) error {
 			return fmt.Errorf("could not connect to the Redis server - %s", err)
 		}
 	}
-	_, err := r.conn.Write(core.RespEncode(core.SimpleString, command+" "+content))
+	cmd := core.RespElem{
+		Type:    core.SimpleString,
+		Content: command + " " + content,
+	}
+	_, err := r.conn.Write(cmd.Encode())
 	return err
 }
 
