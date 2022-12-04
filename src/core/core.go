@@ -33,7 +33,7 @@ func (r RespElem) Encode() []byte {
 		c := r.Content.(string)
 		msg = fmt.Sprintf("$%d\r\n%s\r\n", len(c), c)
 	default:
-		msg = ""
+		log.Panicf("unknown RespType %d", r.Type)
 	}
 	return []byte(msg)
 }
