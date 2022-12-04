@@ -29,6 +29,8 @@ func (r RespElem) Encode() []byte {
 		msg = fmt.Sprintf("+%s\r\n", r.Content.(string))
 	case Error:
 		msg = fmt.Sprintf("-%s\r\n", r.Content.(string))
+	case Integer:
+		msg = fmt.Sprintf(":%d\r\n", r.Content.(int))
 	case BulkString:
 		c := r.Content.(string)
 		msg = fmt.Sprintf("$%d\r\n%s\r\n", len(c), c)
