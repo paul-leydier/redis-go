@@ -59,9 +59,9 @@ func (r *Client) SimpleStringResponse() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	respType, resp := core.RespDecode(encodedResponse)
-	if respType != core.SimpleString {
-		return "", fmt.Errorf("invalid response - %s", resp)
+	resp, err := core.RespDecode(encodedResponse).String()
+	if err != nil {
+		return "", fmt.Errorf("invalid response - %s", err)
 	}
 	return resp, nil
 }

@@ -62,9 +62,9 @@ func Serve(conn net.Conn) {
 // Instructions logic -------------------------------------
 
 func handleMessage(msg []byte) ([]byte, error) {
-	respType, message := core.RespDecode(msg)
-	if respType != core.SimpleString {
-		return nil, fmt.Errorf("commands should be SimpleString, got %d - %s", respType, message)
+	message, err := core.RespDecode(msg).String()
+	if err != nil {
+		return nil, fmt.Errorf("received invalid message - %s", err)
 	}
 	command := strings.Split(strings.TrimSpace(message), " ")
 	if len(command) == 0 {
