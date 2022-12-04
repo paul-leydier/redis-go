@@ -42,6 +42,32 @@ func TestRespElem_EncodeBulkStringWithReturns(t *testing.T) {
 	assertEqual(t, "$14\r\nhello \r\nworld!\r\n", encoded)
 }
 
+func TestRespElem_EncodeArrayEmpty(t *testing.T) {
+	// Encoding an empty RESP Array
+	encoded := RespElem{
+		Type:    Array,
+		Content: []RespElem{},
+	}.Encode()
+	assertEqual(t, "*0\r\n", encoded)
+}
+
+func TestRespElem_EncodeArrayBulkStrings(t *testing.T) {
+	encoded := RespElem{
+		Type: Array,
+		Content: []RespElem{
+			{
+				Type:    BulkString,
+				Content: "hello",
+			},
+			{
+				Type:    BulkString,
+				Content: "world",
+			},
+		},
+	}.Encode()
+	assertEqual(t, "*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n", encoded)
+}
+
 func TestRespDecodeSimpleString(t *testing.T) {
 	respType, decoded := RespDecode([]byte("+lorem ipsum\r\n"))
 	if respType != SimpleString {
