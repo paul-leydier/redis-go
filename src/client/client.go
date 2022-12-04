@@ -39,6 +39,12 @@ func (r *Client) Close() error {
 }
 
 func (r *Client) CustomCommand(command string, content string) error {
+	if r.conn == nil {
+		err := r.Connect()
+		if err != nil {
+			return fmt.Errorf("could not connect to the Redis server - %s", err)
+		}
+	}
 	_, err := r.conn.Write(core.RespEncode(core.SimpleString, command+" "+content))
 	return err
 }
