@@ -16,6 +16,12 @@ func Run(network string, url string, port string) {
 	if err != nil {
 		log.Fatalf("could not bind to port - %s", err)
 	}
+	defer func(l net.Listener) {
+		err := l.Close()
+		if err != nil {
+			log.Panicf("error while closing the net.Listener - %s", err)
+		}
+	}(l)
 	Listen(l)
 }
 func Listen(l net.Listener) {
