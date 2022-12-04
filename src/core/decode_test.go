@@ -3,9 +3,9 @@ package core
 import "testing"
 
 func TestRespDecodeSimpleString(t *testing.T) {
-	respType, decoded := RespDecode([]byte("+lorem ipsum\r\n"))
-	if respType != SimpleString {
-		t.Fatalf("invalid response type: expected %d, got %d", SimpleString, respType)
+	decoded, err := RespDecode([]byte("+lorem ipsum\r\n")).String()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
 	}
 	const expected = "lorem ipsum"
 	if decoded != expected {
@@ -15,9 +15,9 @@ func TestRespDecodeSimpleString(t *testing.T) {
 
 func TestRespDecodeBulkString(t *testing.T) {
 	// Decoding BulkString format
-	respType, decoded := RespDecode([]byte("$5\r\nhello\r\n"))
-	if respType != BulkString {
-		t.Fatalf("invalid response type: expected %d, got %d", BulkString, respType)
+	decoded, err := RespDecode([]byte("$5\r\nhello\r\n")).String()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
 	}
 	const expected = "hello"
 	if decoded != expected {
@@ -26,9 +26,9 @@ func TestRespDecodeBulkString(t *testing.T) {
 }
 
 func TestRespDecodeBulkStringEmpty(t *testing.T) {
-	respType, decoded := RespDecode([]byte("$0\r\n\r\n"))
-	if respType != BulkString {
-		t.Fatalf("invalid response type: expected %d, got %d", BulkString, respType)
+	decoded, err := RespDecode([]byte("$0\r\n\r\n")).String()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
 	}
 	const expected = ""
 	if decoded != expected {
@@ -37,9 +37,9 @@ func TestRespDecodeBulkStringEmpty(t *testing.T) {
 }
 
 func TestRespDecodeBulkStringWithReturns(t *testing.T) {
-	respType, decoded := RespDecode([]byte("$14\r\nhello \r\nworld!\r\n"))
-	if respType != BulkString {
-		t.Fatalf("invalid response type: expected %d, got %d", BulkString, respType)
+	decoded, err := RespDecode([]byte("$14\r\nhello \r\nworld!\r\n")).String()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
 	}
 	const expected = "hello \r\nworld!"
 	if decoded != expected {
