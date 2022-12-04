@@ -1,7 +1,6 @@
 package server
 
 import (
-	"bytes"
 	"net"
 	redis "redis-go/client"
 	"testing"
@@ -41,46 +40,32 @@ func Test_ConcurrentClients(t *testing.T) {
 
 func Test_Ping(t *testing.T) {
 	// A "PING" command should receive a "PONG" response
-	server, client := net.Pipe()
+	serverConn, client := redis.MockServerClient()
 	go func() {
-		Serve(server)
+		Serve(serverConn)
 	}()
-	msg := []byte("+PING\r\n")
-	_, err := client.Write(msg)
+	resp, err := client.Ping("")
 	if err != nil {
-		t.Fatalf("could not write to localhost:6379 - %s", err)
+		t.Fatalf("error during client.Ping - %s", err)
 	}
-	resp := make([]byte, 64)
-	_, err = client.Read(resp)
-	resp = bytes.Trim(resp, "\x00")
-	if err != nil {
-		t.Fatalf("could not read from localhost:6379 - %s", err)
-	}
-	if string(resp) != "+PONG\r\n" {
-		t.Fatalf("invalid response: expected %s, got %s", "+PONG", resp)
+	if resp != "PONG" {
+		t.Fatalf("invalid response: expected %s, got %s", "PONG", resp)
 	}
 }
 
 func Test_Multiple_Pings(t *testing.T) {
 	// A single connection should be able to send multiple commands
-	server, client := net.Pipe()
+	serverConn, client := redis.MockServerClient()
 	go func() {
-		Serve(server)
+		Serve(serverConn)
 	}()
-	msg := []byte("+PING\r\n")
 	for i := 0; i < 10; i++ {
-		_, err := client.Write(msg)
+		resp, err := client.Ping("")
 		if err != nil {
-			t.Fatalf("could not write to localhost:6379 - %s", err)
+			t.Fatalf("error during client.Ping - %s", err)
 		}
-		resp := make([]byte, 64)
-		_, err = client.Read(resp)
-		resp = bytes.Trim(resp, "\x00")
-		if err != nil {
-			t.Fatalf("could not read from localhost:6379 - %s", err)
-		}
-		if string(resp) != "+PONG\r\n" {
-			t.Fatalf("invalid response: expected %s, got %s", "+PONG", resp)
+		if resp != "PONG" {
+			t.Fatalf("invalid response: expected %s, got %s", "PONG", resp)
 		}
 	}
 }
