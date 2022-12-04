@@ -32,10 +32,21 @@ func (r RespElem) Encode() []byte {
 	case BulkString:
 		c := r.Content.(string)
 		msg = fmt.Sprintf("$%d\r\n%s\r\n", len(c), c)
+	case Array:
+		a := r.Content.([]RespElem)
+		msg = encodeArray(a)
 	default:
 		log.Panicf("unknown RespType %d", r.Type)
 	}
 	return []byte(msg)
+}
+
+func encodeArray(arr []RespElem) string {
+	var encodedElements []byte
+	for _, a := range arr {
+		encodedElements = append(encodedElements, a.Encode()...)
+	}
+	return fmt.Sprintf("*%d\r\n%s", len(arr), encodedElements)
 }
 
 func RespDecode(msg []byte) (RespType, string) {
