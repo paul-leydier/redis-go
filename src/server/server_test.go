@@ -20,11 +20,11 @@ func Test_ConcurrentClients(t *testing.T) {
 	go Run("tcp", "localhost", "6380")
 	client1 := redis.NewClient("localhost", "6380")
 	client2 := redis.NewClient("localhost", "6380")
-	_, err := client1.Ping("")
+	_, err := client1.Ping()
 	if err != nil {
 		t.Fatalf("error during client1 Ping - %s", err)
 	}
-	_, err = client2.Ping("")
+	_, err = client2.Ping()
 	if err != nil {
 		t.Fatalf("error during client2 Ping - %s", err)
 	}
@@ -44,7 +44,7 @@ func Test_Ping(t *testing.T) {
 	go func() {
 		Serve(serverConn)
 	}()
-	resp, err := client.Ping("")
+	resp, err := client.Ping()
 	if err != nil {
 		t.Fatalf("error during client.Ping - %s", err)
 	}
@@ -60,7 +60,7 @@ func Test_Multiple_Pings(t *testing.T) {
 		Serve(serverConn)
 	}()
 	for i := 0; i < 10; i++ {
-		resp, err := client.Ping("")
+		resp, err := client.Ping()
 		if err != nil {
 			t.Fatalf("error during client.Ping - %s", err)
 		}
@@ -73,7 +73,7 @@ func Test_Multiple_Pings(t *testing.T) {
 func TestInvalidCommand(t *testing.T) {
 	serverConn, client := redis.MockServerClient()
 	go Serve(serverConn)
-	err := client.CustomCommand("FOO", "")
+	err := client.CustomCommand("FOO")
 	if err != nil {
 		t.Fatalf("error while sending invalid command - %s", err)
 	}

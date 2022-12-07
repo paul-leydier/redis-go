@@ -21,24 +21,12 @@ func TestClient_Close(t *testing.T) {
 func TestClient_Ping(t *testing.T) {
 	serverConn, client := MockServerClient()
 	go server.Serve(serverConn)
-	response, err := client.Ping("")
+	response, err := client.Ping()
 	if err != nil {
 		t.Fatalf("error during call to Client.Ping - %s", err)
 	}
 	if response != "PONG" {
 		t.Fatalf("expected 'PONG' response, got %s", response)
-	}
-}
-
-func TestClient_PingWithText(t *testing.T) {
-	serverConn, client := MockServerClient()
-	go server.Serve(serverConn)
-	response, err := client.Ping("toto")
-	if err != nil {
-		t.Fatalf("error during call to Client.Ping - %s", err)
-	}
-	if response != "toto" {
-		t.Fatalf("expected 'toto' response, got %s", response)
 	}
 }
 

@@ -63,11 +63,17 @@ func Serve(conn net.Conn) {
 
 func handleMessage(msg []byte) ([]byte, error) {
 	encoded := core.NewEncodedRespElem(msg)
-	message, err := encoded.Decode().String()
+	messages, err := encoded.Decode().Array()
 	if err != nil {
 		return nil, fmt.Errorf("received invalid message - %s", err)
 	}
-	command := strings.Split(strings.TrimSpace(message), " ")
+	command := make([]string, len(messages))
+	for i, msg := range messages {
+		command[i], err = msg.String()
+		if err != nil {
+			return nil, err
+		}
+	}
 	if len(command) == 0 {
 		return nil, fmt.Errorf("empty command - %s", command)
 	}
