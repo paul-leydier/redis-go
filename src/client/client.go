@@ -60,7 +60,7 @@ func (r *Client) SimpleStringResponse() (string, error) {
 		return "", err
 	}
 	encoded := core.NewEncodedRespElem(msg)
-	resp, err := core.RespDecode(&encoded).String()
+	resp, err := encoded.Decode().String()
 	if err != nil {
 		return "", fmt.Errorf("invalid response - %s", err)
 	}

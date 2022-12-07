@@ -48,24 +48,24 @@ func NewEncodedRespElem(msg []byte) EncodedRespElem {
 	}
 }
 
-func RespDecode(encoded *EncodedRespElem) RespElem {
-	if len(encoded.msg) == 0 {
+func (e *EncodedRespElem) Decode() RespElem {
+	if len(e.msg) == 0 {
 		log.Panicf("cannot decode empty msg")
 	}
 	//encoded = bytes.Trim(encoded, "\x00")
-	switch encoded.msg[encoded.cursor] {
+	switch e.msg[e.cursor] {
 	case '+':
-		return decodeSimpleString(encoded)
+		return decodeSimpleString(e)
 	case '-':
-		return decodeError(encoded)
+		return decodeError(e)
 	case ':':
-		return decodeInt(encoded)
+		return decodeInt(e)
 	case '$':
-		return parseBulkString(encoded)
+		return parseBulkString(e)
 	case '*':
-		return decodeArray(encoded)
+		return decodeArray(e)
 	default:
-		panic(fmt.Sprintf("unknown msg type identifier %b", encoded.msg[encoded.cursor]))
+		panic(fmt.Sprintf("unknown msg type identifier %b", e.msg[e.cursor]))
 	}
 }
 
@@ -126,7 +126,7 @@ func decodeArray(encoded *EncodedRespElem) RespElem {
 	msgLength := parsePrefix(encoded)
 	arr := make([]RespElem, msgLength)
 	for i := 0; i < msgLength; i++ {
-		arr[i] = RespDecode(encoded)
+		arr[i] = encoded.Decode()
 	}
 	return RespElem{
 		Type:    Array,

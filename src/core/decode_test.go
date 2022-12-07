@@ -4,7 +4,7 @@ import "testing"
 
 func TestRespDecodeSimpleString(t *testing.T) {
 	encoded := NewEncodedRespElem([]byte("+lorem ipsum\r\n"))
-	decoded, err := RespDecode(&encoded).String()
+	decoded, err := encoded.Decode().String()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -17,7 +17,7 @@ func TestRespDecodeSimpleString(t *testing.T) {
 func TestRespDecodeBulkString(t *testing.T) {
 	// Decoding BulkString format
 	encoded := NewEncodedRespElem([]byte("$5\r\nhello\r\n"))
-	decoded, err := RespDecode(&encoded).String()
+	decoded, err := encoded.Decode().String()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -30,7 +30,7 @@ func TestRespDecodeBulkString(t *testing.T) {
 func TestRespDecodeInteger(t *testing.T) {
 	// Decoding Integer format
 	encoded := NewEncodedRespElem([]byte(":1253\r\n"))
-	decoded, err := RespDecode(&encoded).Int()
+	decoded, err := encoded.Decode().Int()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -42,7 +42,7 @@ func TestRespDecodeInteger(t *testing.T) {
 
 func TestRespDecodeBulkStringEmpty(t *testing.T) {
 	encoded := NewEncodedRespElem([]byte("$0\r\n\r\n"))
-	decoded, err := RespDecode(&encoded).String()
+	decoded, err := encoded.Decode().String()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -54,7 +54,7 @@ func TestRespDecodeBulkStringEmpty(t *testing.T) {
 
 func TestRespDecodeBulkStringWithReturns(t *testing.T) {
 	encoded := NewEncodedRespElem([]byte("$14\r\nhello \r\nworld!\r\n"))
-	decoded, err := RespDecode(&encoded).String()
+	decoded, err := encoded.Decode().String()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -67,7 +67,7 @@ func TestRespDecodeBulkStringWithReturns(t *testing.T) {
 func TestRespDecodeArrayEmpty(t *testing.T) {
 	// Decoding an empty RESP Array
 	encoded := NewEncodedRespElem([]byte("*0\r\n"))
-	decoded, err := RespDecode(&encoded).Array()
+	decoded, err := encoded.Decode().Array()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -78,7 +78,7 @@ func TestRespDecodeArrayEmpty(t *testing.T) {
 
 func TestRespDecodeArrayBulkString(t *testing.T) {
 	encoded := NewEncodedRespElem([]byte("*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n"))
-	decoded, err := RespDecode(&encoded).Array()
+	decoded, err := encoded.Decode().Array()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -102,7 +102,7 @@ func TestRespDecodeArrayBulkString(t *testing.T) {
 
 func TestRespDecodeArrayMixedType(t *testing.T) {
 	encoded := NewEncodedRespElem([]byte("*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n"))
-	decoded, err := RespDecode(&encoded).Array()
+	decoded, err := encoded.Decode().Array()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}

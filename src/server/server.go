@@ -63,7 +63,7 @@ func Serve(conn net.Conn) {
 
 func handleMessage(msg []byte) ([]byte, error) {
 	encoded := core.NewEncodedRespElem(msg)
-	message, err := core.RespDecode(&encoded).String()
+	message, err := encoded.Decode().String()
 	if err != nil {
 		return nil, fmt.Errorf("received invalid message - %s", err)
 	}
