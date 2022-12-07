@@ -61,7 +61,7 @@ func RespDecode(encoded *EncodedRespElem) RespElem {
 	case '$':
 		return parseBulkString(encoded)
 	case '*':
-		return RespElem{Array, decodeArray(encoded)}
+		return decodeArray(encoded)
 	default:
 		panic(fmt.Sprintf("unknown msg type identifier %b", encoded.msg[encoded.cursor]))
 	}
