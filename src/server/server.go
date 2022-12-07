@@ -53,7 +53,7 @@ func (s *Server) Serve(conn net.Conn) {
 			log.Fatalf("could not read message - %s", err)
 		}
 		msg = bytes.Trim(msg, "\x00")
-		response, err := handleMessage(msg)
+		response, err := s.handleMessage(msg)
 		if err != nil {
 			response = handleServingError(err)
 		}

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func handleMessage(msg []byte) ([]byte, error) {
+func (s *Server) handleMessage(msg []byte) ([]byte, error) {
 	encoded := core.NewEncodedRespElem(msg)
 	messages, err := encoded.Decode().Array()
 	if err != nil {
@@ -29,6 +29,18 @@ func handleMessage(msg []byte) ([]byte, error) {
 		return pingCommand(command), nil
 	case "ECHO":
 		return echoCommand(command), nil
+	case "GET":
+		value, err := s.getCommand(command)
+		if err != nil {
+			return nil, err
+		}
+		return value, nil
+	case "SET":
+		response, err := s.setCommand(command)
+		if err != nil {
+			return nil, err
+		}
+		return response, nil
 	default:
 		return nil, InvalidCommandError{received: command[0]}
 	}
