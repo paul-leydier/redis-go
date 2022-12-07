@@ -3,6 +3,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"redis-go/core"
 	"strings"
@@ -67,4 +68,25 @@ func echoCommand(command []string) []byte {
 		Type:    core.SimpleString,
 		Content: strings.Join(command[1:], " "),
 	}.Encode()
+}
+
+func (s *Server) getCommand(command []string) ([]byte, error) {
+	if len(command) < 2 {
+		return nil, errors.New("need a key for the GET command")
+	}
+	return core.RespElem{
+		Type:    core.BulkString,
+		Content: s.storage.Get(command[1]),
+	}.Encode(), nil
+}
+
+func (s *Server) setCommand(command []string) ([]byte, error) {
+	if len(command) < 3 {
+		return nil, fmt.Errorf("need a key and a value for the SET command - got %v", command)
+	}
+	s.storage.Set(command[1], command[2])
+	return core.RespElem{
+		Type:    core.SimpleString,
+		Content: "OK",
+	}.Encode(), nil
 }
