@@ -92,6 +92,22 @@ func (r *Client) Echo(content string) (string, error) {
 	return r.SimpleStringResponse()
 }
 
+func (r *Client) Get(key string) (string, error) {
+	err := r.CustomCommand("GET" + " " + key)
+	if err != nil {
+		return "", err
+	}
+	return r.SimpleStringResponse()
+}
+
+func (r *Client) Set(key string, value string) (string, error) {
+	err := r.CustomCommand("SET" + " " + key + " " + value)
+	if err != nil {
+		return "", err
+	}
+	return r.SimpleStringResponse()
+}
+
 func MockServerClient() (net.Conn, Client) {
 	clientConn, serverConn := net.Pipe()
 	client := NewClient("localhost", "6379")
