@@ -116,7 +116,7 @@ func decodeArray(encoded *EncodedRespElem) RespElem {
 	msgLength := parsePrefix(encoded)
 	arr := make([]RespElem, msgLength)
 	for i := 0; i < msgLength; i++ {
-		arr = append(arr, RespDecode(encoded))
+		arr[i] = RespDecode(encoded)
 	}
 	return RespElem{
 		Type:    Array,
