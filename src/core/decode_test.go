@@ -51,6 +51,65 @@ func TestRespDecodeBulkStringWithReturns(t *testing.T) {
 	}
 }
 
+func TestRespDecodeArrayEmpty(t *testing.T) {
+	// Decoding an empty RESP Array
+	encoded := NewEncodedRespElem([]byte("*0\r\n"))
+	decoded, err := RespDecode(&encoded).Array()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
+	}
+	if len(decoded) != 0 {
+		t.Fatalf("expected empty array, got %v", decoded)
+	}
+}
+
+func TestRespDecodeArrayBulkString(t *testing.T) {
+	encoded := NewEncodedRespElem([]byte("*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n"))
+	decoded, err := RespDecode(&encoded).Array()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
+	}
+	const expected = "hello"
+	s, err := decoded[0].String()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
+	}
+	if s != expected {
+		t.Fatalf("expected %s, got %s", expected, s)
+	}
+	const expected2 = "world"
+	s, err = decoded[1].String()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
+	}
+	if s != expected2 {
+		t.Fatalf("expected %s, got %s", expected2, s)
+	}
+}
+
+func TestRespDecodeArrayMixedType(t *testing.T) {
+	encoded := NewEncodedRespElem([]byte("*5\r\n:1\r\n:2\r\n:3\r\n:4\r\n$5\r\nhello\r\n"))
+	decoded, err := RespDecode(&encoded).Array()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
+	}
+	expected := []RespElem{
+		{Integer, 1},
+		{Integer, 2},
+		{Integer, 3},
+		{Integer, 4},
+		{BulkString, "hello"},
+	}
+	for i := 0; i < 5; i++ {
+		if decoded[i].Type != expected[i].Type {
+			t.Fatalf("expected %d, got %d", expected[i].Type, decoded[i].Type)
+		}
+		if decoded[i].Content != expected[i].Content {
+			t.Fatalf("expected %s, got %s", expected[i].Content, decoded[i].Content)
+		}
+	}
+}
+
 func BenchmarkParseBulkString(b *testing.B) {
 	encoded := NewEncodedRespElem([]byte("$14\r\nhello \r\nworld!\r\n"))
 	for i := 0; i < b.N; i++ {
