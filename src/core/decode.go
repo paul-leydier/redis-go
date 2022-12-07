@@ -58,6 +58,8 @@ func RespDecode(encoded *EncodedRespElem) RespElem {
 		return decodeSimpleString(encoded)
 	case '-':
 		return decodeError(encoded)
+	case ':':
+		return decodeInt(encoded)
 	case '$':
 		return parseBulkString(encoded)
 	case '*':
@@ -88,6 +90,14 @@ func decodeError(encoded *EncodedRespElem) RespElem {
 	return RespElem{
 		Type:    Error,
 		Content: string(encoded.msg[start : encoded.cursor-2]),
+	}
+}
+
+func decodeInt(encoded *EncodedRespElem) RespElem {
+	encoded.cursor++ // consume ':'
+	return RespElem{
+		Type:    Integer,
+		Content: parsePrefix(encoded),
 	}
 }
 
