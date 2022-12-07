@@ -4,6 +4,8 @@ package server
 
 import (
 	"bytes"
+	"errors"
+	"io"
 	"log"
 	"net"
 )
@@ -49,6 +51,9 @@ func (s *Server) Serve(conn net.Conn) {
 	for {
 		msg := make([]byte, 64)
 		_, err := conn.Read(msg)
+		if errors.Is(err, io.EOF) { // Connection closed by client
+			return
+		}
 		if err != nil {
 			log.Fatalf("could not read message - %s", err)
 		}
