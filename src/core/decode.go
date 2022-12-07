@@ -52,7 +52,6 @@ func (e *EncodedRespElem) Decode() RespElem {
 	if len(e.msg) == 0 {
 		log.Panicf("cannot decode empty msg")
 	}
-	//encoded = bytes.Trim(encoded, "\x00")
 	switch e.msg[e.cursor] {
 	case '+':
 		return decodeSimpleString(e)
