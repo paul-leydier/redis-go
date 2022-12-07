@@ -27,6 +27,19 @@ func TestRespDecodeBulkString(t *testing.T) {
 	}
 }
 
+func TestRespDecodeInteger(t *testing.T) {
+	// Decoding Integer format
+	encoded := NewEncodedRespElem([]byte(":1253\r\n"))
+	decoded, err := RespDecode(&encoded).Int()
+	if err != nil {
+		t.Fatalf("error decoding resp - %s", err)
+	}
+	const expected = 1253
+	if decoded != expected {
+		t.Fatalf("expected %d, got %d", expected, decoded)
+	}
+}
+
 func TestRespDecodeBulkStringEmpty(t *testing.T) {
 	encoded := NewEncodedRespElem([]byte("$0\r\n\r\n"))
 	decoded, err := RespDecode(&encoded).String()
