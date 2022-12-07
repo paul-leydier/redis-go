@@ -1,12 +1,22 @@
 package core
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"log"
-	"strings"
 )
+
+type EncodedRespElem struct {
+	msg    []byte
+	cursor int
+}
+
+func NewEncodedRespElem(msg []byte) EncodedRespElem {
+	return EncodedRespElem{
+		msg:    msg,
+		cursor: 0,
+	}
+}
 
 func (r RespElem) String() (string, error) {
 	if r.Type == Error {
@@ -28,39 +38,88 @@ func (r RespElem) Int() (int, error) {
 	return r.Content.(int), nil
 }
 
-func RespDecode(msg []byte) RespElem {
-	if len(msg) == 0 {
+func (r RespElem) Array() ([]RespElem, error) {
+	if r.Type == Error {
+		return nil, errors.New(r.Content.(string))
+	}
+	if r.Type != Array {
+		return nil, fmt.Errorf("invalid RespType: expected %d, got %d", Integer, r.Type)
+	}
+	return r.Content.([]RespElem), nil
+}
+
+func RespDecode(encoded *EncodedRespElem) RespElem {
+	if len(encoded.msg) == 0 {
 		log.Panicf("cannot decode empty msg")
 	}
-	msg = bytes.Trim(msg, "\x00")
-	switch msg[0] {
+	//encoded = bytes.Trim(encoded, "\x00")
+	switch encoded.msg[encoded.cursor] {
 	case '+':
-		decoded := string(msg[1:])
-		return RespElem{SimpleString, strings.TrimRight(decoded, "\r\n")}
+		return decodeSimpleString(encoded)
 	case '-':
-		decoded := string(msg[1:])
-		return RespElem{Error, strings.TrimRight(decoded, "\r\n")}
+		return decodeError(encoded)
 	case '$':
-		return RespElem{BulkString, parseBulkString(msg)}
+		return parseBulkString(encoded)
+	case '*':
+		return RespElem{Array, decodeArray(encoded)}
 	default:
-		panic(fmt.Sprintf("unknown msg type identifier %b", msg[0]))
+		panic(fmt.Sprintf("unknown msg type identifier %b", encoded.msg[encoded.cursor]))
 	}
 }
 
-func parseBulkStringNaive(msg []byte) string {
-	parts := bytes.SplitN(msg, []byte("\r\n"), 2)
-	if len(parts) < 2 {
-		log.Panicf("cannot decode BulkString %b", msg)
+func decodeSimpleString(encoded *EncodedRespElem) RespElem {
+	encoded.cursor++ // consume '+'
+	start := encoded.cursor
+	for ; encoded.msg[encoded.cursor] != '\r'; encoded.cursor++ {
 	}
-	return string(bytes.TrimRight(parts[1], "\r\n"))
+	encoded.cursor += 2 // consume '\r\n'
+	return RespElem{
+		Type:    SimpleString,
+		Content: string(encoded.msg[start : encoded.cursor-2]),
+	}
 }
 
-func parseBulkString(msg []byte) string {
-	msgLength := uint8(0)
-	prefixLength := 0
-	for i := 1; msg[i] != '\r'; i++ {
-		msgLength = (msgLength * 10) + (msg[i] - '0')
-		prefixLength = i
+func decodeError(encoded *EncodedRespElem) RespElem {
+	encoded.cursor++ // consume '-'
+	start := encoded.cursor
+	for ; encoded.msg[encoded.cursor] != '\r'; encoded.cursor++ {
 	}
-	return string(msg[prefixLength+3 : prefixLength+3+int(msgLength)])
+	encoded.cursor += 2 // consume '\r\n'
+	return RespElem{
+		Type:    Error,
+		Content: string(encoded.msg[start : encoded.cursor-2]),
+	}
+}
+
+func parseBulkString(encoded *EncodedRespElem) RespElem {
+	encoded.cursor++ // consume '$'
+	msgLength := parsePrefix(encoded)
+	start := encoded.cursor
+	encoded.cursor += msgLength + 2 // consume message and '\r\n'
+	return RespElem{
+		Type:    BulkString,
+		Content: string(encoded.msg[start : encoded.cursor-2]),
+	}
+}
+
+func parsePrefix(encoded *EncodedRespElem) int {
+	msgLength := 0
+	for ; encoded.msg[encoded.cursor] != '\r'; encoded.cursor++ {
+		msgLength = (msgLength * 10) + (int(encoded.msg[encoded.cursor]) - '0')
+	}
+	encoded.cursor += 2 // consume '\r\n'
+	return msgLength
+}
+
+func decodeArray(encoded *EncodedRespElem) RespElem {
+	encoded.cursor++ // consume '*'
+	msgLength := parsePrefix(encoded)
+	arr := make([]RespElem, msgLength)
+	for i := 0; i < msgLength; i++ {
+		arr = append(arr, RespDecode(encoded))
+	}
+	return RespElem{
+		Type:    Array,
+		Content: arr,
+	}
 }

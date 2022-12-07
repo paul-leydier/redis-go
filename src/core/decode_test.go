@@ -3,7 +3,8 @@ package core
 import "testing"
 
 func TestRespDecodeSimpleString(t *testing.T) {
-	decoded, err := RespDecode([]byte("+lorem ipsum\r\n")).String()
+	encoded := NewEncodedRespElem([]byte("+lorem ipsum\r\n"))
+	decoded, err := RespDecode(&encoded).String()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -15,7 +16,8 @@ func TestRespDecodeSimpleString(t *testing.T) {
 
 func TestRespDecodeBulkString(t *testing.T) {
 	// Decoding BulkString format
-	decoded, err := RespDecode([]byte("$5\r\nhello\r\n")).String()
+	encoded := NewEncodedRespElem([]byte("$5\r\nhello\r\n"))
+	decoded, err := RespDecode(&encoded).String()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -26,7 +28,8 @@ func TestRespDecodeBulkString(t *testing.T) {
 }
 
 func TestRespDecodeBulkStringEmpty(t *testing.T) {
-	decoded, err := RespDecode([]byte("$0\r\n\r\n")).String()
+	encoded := NewEncodedRespElem([]byte("$0\r\n\r\n"))
+	decoded, err := RespDecode(&encoded).String()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -37,7 +40,8 @@ func TestRespDecodeBulkStringEmpty(t *testing.T) {
 }
 
 func TestRespDecodeBulkStringWithReturns(t *testing.T) {
-	decoded, err := RespDecode([]byte("$14\r\nhello \r\nworld!\r\n")).String()
+	encoded := NewEncodedRespElem([]byte("$14\r\nhello \r\nworld!\r\n"))
+	decoded, err := RespDecode(&encoded).String()
 	if err != nil {
 		t.Fatalf("error decoding resp - %s", err)
 	}
@@ -47,14 +51,10 @@ func TestRespDecodeBulkStringWithReturns(t *testing.T) {
 	}
 }
 
-func BenchmarkParseBulkStringNaive(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		parseBulkStringNaive([]byte("$14\r\nhello \r\nworld!\r\n"))
-	}
-}
-
 func BenchmarkParseBulkString(b *testing.B) {
+	encoded := NewEncodedRespElem([]byte("$14\r\nhello \r\nworld!\r\n"))
 	for i := 0; i < b.N; i++ {
-		parseBulkString([]byte("$14\r\nhello \r\nworld!\r\n"))
+		parseBulkString(&encoded)
+		encoded.cursor = 0
 	}
 }

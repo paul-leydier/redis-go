@@ -54,12 +54,13 @@ func (r *Client) CustomCommand(command string, content string) error {
 }
 
 func (r *Client) SimpleStringResponse() (string, error) {
-	encodedResponse := make([]byte, 64)
-	_, err := r.conn.Read(encodedResponse)
+	msg := make([]byte, 64)
+	_, err := r.conn.Read(msg)
 	if err != nil {
 		return "", err
 	}
-	resp, err := core.RespDecode(encodedResponse).String()
+	encoded := core.NewEncodedRespElem(msg)
+	resp, err := core.RespDecode(&encoded).String()
 	if err != nil {
 		return "", fmt.Errorf("invalid response - %s", err)
 	}
