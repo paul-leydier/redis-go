@@ -6,18 +6,6 @@ import (
 	"log"
 )
 
-type EncodedRespElem struct {
-	msg    []byte
-	cursor int
-}
-
-func NewEncodedRespElem(msg []byte) EncodedRespElem {
-	return EncodedRespElem{
-		msg:    msg,
-		cursor: 0,
-	}
-}
-
 func (r RespElem) String() (string, error) {
 	if r.Type == Error {
 		return "", errors.New(r.Content.(string))
@@ -46,6 +34,18 @@ func (r RespElem) Array() ([]RespElem, error) {
 		return nil, fmt.Errorf("invalid RespType: expected %d, got %d", Integer, r.Type)
 	}
 	return r.Content.([]RespElem), nil
+}
+
+type EncodedRespElem struct {
+	msg    []byte
+	cursor int
+}
+
+func NewEncodedRespElem(msg []byte) EncodedRespElem {
+	return EncodedRespElem{
+		msg:    msg,
+		cursor: 0,
+	}
 }
 
 func RespDecode(encoded *EncodedRespElem) RespElem {
