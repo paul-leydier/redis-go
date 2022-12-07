@@ -94,3 +94,22 @@ func Test_Echo(t *testing.T) {
 		t.Fatalf("expected 'toto tata titi,tutu' response, got %s", response)
 	}
 }
+
+func Test_SetGet(t *testing.T) {
+	serverConn, client := redis.MockServerClient()
+	go NewServer().Serve(serverConn)
+	response, err := client.Set("foo", "bar")
+	if err != nil {
+		t.Fatalf("error during call to Client.Set - %s", err)
+	}
+	if response != "OK" {
+		t.Fatalf("expected 'OK' response, got %s", response)
+	}
+	response, err = client.Get("foo")
+	if err != nil {
+		t.Fatalf("error during call to Client.Get - %s", err)
+	}
+	if response != "bar" {
+		t.Fatalf("expected 'bar' response, got %s", response)
+	}
+}
