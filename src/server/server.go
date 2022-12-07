@@ -106,7 +106,7 @@ func echoCommand(command []string) []byte {
 	}
 	return core.RespElem{
 		Type:    core.SimpleString,
-		Content: command[1],
+		Content: strings.Join(command[1:], " "),
 	}.Encode()
 }
 

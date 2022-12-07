@@ -82,3 +82,15 @@ func TestInvalidCommand(t *testing.T) {
 		t.Fatalf("invalid command did not raise an error")
 	}
 }
+
+func Test_Echo(t *testing.T) {
+	serverConn, client := redis.MockServerClient()
+	go Serve(serverConn)
+	response, err := client.Echo("toto tata titi,tutu")
+	if err != nil {
+		t.Fatalf("error during call to Client.Ping - %s", err)
+	}
+	if response != "toto tata titi,tutu" {
+		t.Fatalf("expected 'toto tata titi,tutu' response, got %s", response)
+	}
+}
