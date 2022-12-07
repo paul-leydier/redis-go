@@ -20,7 +20,7 @@ func TestClient_Close(t *testing.T) {
 
 func TestClient_Ping(t *testing.T) {
 	serverConn, client := MockServerClient()
-	go server.Serve(serverConn)
+	go server.NewServer().Serve(serverConn)
 	response, err := client.Ping()
 	if err != nil {
 		t.Fatalf("error during call to Client.Ping - %s", err)
@@ -32,7 +32,7 @@ func TestClient_Ping(t *testing.T) {
 
 func TestClient_Echo(t *testing.T) {
 	serverConn, client := MockServerClient()
-	go server.Serve(serverConn)
+	go server.NewServer().Serve(serverConn)
 	response, err := client.Echo("toto")
 	if err != nil {
 		t.Fatalf("error during call to Client.Ping - %s", err)

@@ -8,7 +8,7 @@ import (
 
 func Test_Listen(t *testing.T) {
 	// should be able to bind to localhost:6379
-	go Run("tcp", "localhost", "6379")
+	go NewServer().Run("tcp", "localhost", "6379")
 	_, err := net.Dial("tcp", "localhost:6379")
 	if err != nil {
 		t.Fatalf("could not connect to localhost:6379 - %s", err)
@@ -17,7 +17,7 @@ func Test_Listen(t *testing.T) {
 
 func Test_ConcurrentClients(t *testing.T) {
 	// Multiple clients should be able to interact concurrently with the server
-	go Run("tcp", "localhost", "6380")
+	go NewServer().Run("tcp", "localhost", "6380")
 	client1 := redis.NewClient("localhost", "6380")
 	client2 := redis.NewClient("localhost", "6380")
 	_, err := client1.Ping()
@@ -42,7 +42,7 @@ func Test_Ping(t *testing.T) {
 	// A "PING" command should receive a "PONG" response
 	serverConn, client := redis.MockServerClient()
 	go func() {
-		Serve(serverConn)
+		NewServer().Serve(serverConn)
 	}()
 	resp, err := client.Ping()
 	if err != nil {
@@ -57,7 +57,7 @@ func Test_Multiple_Pings(t *testing.T) {
 	// A single connection should be able to send multiple commands
 	serverConn, client := redis.MockServerClient()
 	go func() {
-		Serve(serverConn)
+		NewServer().Serve(serverConn)
 	}()
 	for i := 0; i < 10; i++ {
 		resp, err := client.Ping()
@@ -72,7 +72,7 @@ func Test_Multiple_Pings(t *testing.T) {
 
 func TestInvalidCommand(t *testing.T) {
 	serverConn, client := redis.MockServerClient()
-	go Serve(serverConn)
+	go NewServer().Serve(serverConn)
 	err := client.CustomCommand("FOO")
 	if err != nil {
 		t.Fatalf("error while sending invalid command - %s", err)
@@ -85,7 +85,7 @@ func TestInvalidCommand(t *testing.T) {
 
 func Test_Echo(t *testing.T) {
 	serverConn, client := redis.MockServerClient()
-	go Serve(serverConn)
+	go NewServer().Serve(serverConn)
 	response, err := client.Echo("toto tata titi,tutu")
 	if err != nil {
 		t.Fatalf("error during call to Client.Ping - %s", err)

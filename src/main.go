@@ -9,5 +9,6 @@ const (
 )
 
 func main() {
-	server.Run(network, url, port)
+	s := server.NewServer()
+	s.Run(network, url, port)
 }

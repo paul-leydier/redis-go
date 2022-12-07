@@ -8,7 +8,15 @@ import (
 	"net"
 )
 
-func Run(network string, url string, port string) {
+type Server struct {
+	storage *storage
+}
+
+func NewServer() *Server {
+	return &Server{storage: newStorage()}
+}
+
+func (s *Server) Run(network string, url string, port string) {
 	l, err := net.Listen(network, url+":"+port)
 	if err != nil {
 		log.Fatalf("could not bind to port - %s", err)
@@ -19,19 +27,19 @@ func Run(network string, url string, port string) {
 			log.Panicf("error while closing the net.Listener - %s", err)
 		}
 	}(l)
-	Listen(l)
+	s.listen(l)
 }
-func Listen(l net.Listener) {
+func (s *Server) listen(l net.Listener) {
 	for {
 		conn, err := l.Accept()
 		if err != nil {
 			log.Fatalf("could not accept connection - %s", err)
 		}
-		go Serve(conn)
+		go s.Serve(conn)
 	}
 }
 
-func Serve(conn net.Conn) {
+func (s *Server) Serve(conn net.Conn) {
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {
